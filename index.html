@@ -11,16 +11,16 @@
       box-sizing: border-box;
     }
 
-    body {
-      background-color: #000;
-      height: 100vh;
-      width: 100vw;
+    html, body {
+      height: 100%;
+      width: 100%;
       overflow: hidden;
+      background-color: #000;
+      font-family: Arial, sans-serif;
+      color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: Arial, sans-serif;
-      color: #fff;
     }
 
     .slideshow {
@@ -36,7 +36,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain; /* Modo inicial */
+      background-color: #000;
       opacity: 0;
       transition: opacity 1s ease-in-out;
     }
@@ -64,21 +65,44 @@
       padding: 10px 20px;
       border-radius: 10px;
     }
+
+    #toggleFit {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+
+    #toggleFit:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
   </style>
 </head>
 <body>
   <div class="slideshow" id="slideshow">
     <p class="loading">🔄 Carregando imagens...</p>
   </div>
+
   <div class="titulo">Imagens passando automaticamente</div>
+  <button id="toggleFit">🔁 Modo: contain</button>
 
   <script>
     const usuario = "planejamentorj";
     const repositorio = "tv";
     const pasta = "img";
-    const intervalo = 7000; // tempo entre imagens (ms)
+    const intervalo = 9000; // tempo entre imagens (ms)
 
     const container = document.getElementById("slideshow");
+    const botaoToggle = document.getElementById("toggleFit");
+    let modoAtual = 'contain'; // modo inicial
 
     async function carregarImagens() {
       try {
@@ -105,6 +129,8 @@
         imagens.forEach((imgInfo, index) => {
           const tag = document.createElement("img");
           tag.src = imgInfo.download_url;
+          tag.style.objectFit = modoAtual; // Aplica o modo atual
+          tag.style.backgroundColor = "#000";
           if (index === 0) tag.classList.add("active");
           container.appendChild(tag);
         });
@@ -121,6 +147,15 @@
         container.innerHTML = `<p class="loading">⚠️ Erro ao carregar imagens: ${erro.message}</p>`;
       }
     }
+
+    // Alternar entre contain e cover
+    botaoToggle.addEventListener("click", () => {
+      modoAtual = (modoAtual === 'cover') ? 'contain' : 'cover';
+      document.querySelectorAll("#slideshow img").forEach(img => {
+        img.style.objectFit = modoAtual;
+      });
+      botaoToggle.textContent = `🔁 Modo: ${modoAtual}`;
+    });
 
     carregarImagens();
   </script>
